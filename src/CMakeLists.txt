@@ -13,6 +13,7 @@ set(SRCS
     TagDetectionUtils.cc
     TagDetector.cc
     TagFamily.cc
+    atag.cc
     UnionFindSimple.cc)
 
 add_library(apriltags SHARED ${SRCS})

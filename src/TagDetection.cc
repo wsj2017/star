@@ -42,6 +42,18 @@ float TagDetection::getXYOrientation() const {
   return ! std::isnan(float(orient)) ? orient : 0.;
 }
 
+float TagDetection::getXYOrientationD() const {
+  // Because the order of segments in a quad is arbitrary, so is the
+  // homography's rotation, so we can't determine orientation directly
+  // from the homography.  Instead, use the homography to find two
+  // bottom corners of a properly oriented tag in pixel coordinates,
+  // and then compute orientation from that.
+  std::pair<float,float> p0 = interpolate(-1,-1);   // lower left corner of tag
+  std::pair<float,float> p2 = interpolate(1,1);    // lower right corner of tag
+  float orient = atan2(p2.second - p0.second, p2.first - p0.first);
+  return ! std::isnan(float(orient)) ? orient : 0.;
+}
+
 std::pair<float,float> TagDetection::interpolate(float x, float y) const {
   float z = homography(2,0)*x + homography(2,1)*y + homography(2,2);
   if ( z == 0 )
