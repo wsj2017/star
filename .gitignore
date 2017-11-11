@@ -1,0 +1,26 @@
+# swap files
+*.swp
+
+# cmake files
+*.cmake
+
+# bin created
+bin/
+
+# lib create
+lib/
+
+# swo files
+*.swo
+
+# CMake creations
+CMakeCache.txt
+CMakeFiles/
+*/CMakeFiles/
+Makefile
+*/Makefile/
+
+# Misc
+install_manifest.txt
+
+
