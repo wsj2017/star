@@ -21,6 +21,13 @@ TagFamily *tag36h11 = new TagFamily(tagCodes36h11);
 #include "AprilTags/Tag36h9.h"
 
 */
+#include <sys/time.h>
+
+double tic_() {
+  struct timeval t;
+  gettimeofday(&t, NULL);
+  return ((double)t.tv_sec + ((double)t.tv_usec)/1000000.);
+}
 
 using namespace std;
 
@@ -93,6 +100,7 @@ void TagFamily::decode(TagDetection& det, unsigned long long rCode) const {
   rCodes[2] = rotate90(rCodes[1], dimension);
   rCodes[3] = rotate90(rCodes[2], dimension);
 
+  double t0 = tic_();
   for (unsigned int id = 0; id < codes.size(); id++) {
     for (unsigned int rot = 0; rot < 4; rot++) {
       int thisHamming = hammingDistance(rCodes[rot], codes[id]);
@@ -104,12 +112,18 @@ void TagFamily::decode(TagDetection& det, unsigned long long rCode) const {
       }
     }
   }
+  double dt = (tic_()-t0)*20*1000;
+  std::cout << "Search in code book takes " << dt << " ms." << std::endl;
+
   det.id = bestId;
   det.hammingDistance = bestHamming;
   det.rotation = bestRotation;
   det.good = (det.hammingDistance <= errorRecoveryBits);
   det.obsCode = rCode;
   det.code = bestCode;
+  if (det.good) {
+      std::cout << "GOOD" << std::endl;
+  }
 }
 
 void TagFamily::printHammingDistances() const {

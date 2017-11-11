@@ -6,6 +6,13 @@
 #include "apriltags/GrayModel.h"
 #include "apriltags/MathUtil.h"
 #include "apriltags/Gridder.h"
+#include <sys/time.h>
+
+double tic() {
+  struct timeval t;
+  gettimeofday(&t, NULL);
+  return ((double)t.tv_sec + ((double)t.tv_usec)/1000000.);
+}
 
 namespace AprilTags
 {
@@ -349,8 +356,10 @@ std::vector<TagDetection> decode_quads( const cv::Mat& filtered,
 			continue;
 		
 		TagDetection thisTagDetection;
+        double t0 = tic();
 		family.decode(thisTagDetection, tagCode);
-
+        double dt = tic() - t0;
+        std::cout << "Decoding takes " << dt << " second." << std::endl;
 		// compute the homography (and rotate it appropriately)
 		Homography33 hom = quad.homography;
 		hom.compute();
