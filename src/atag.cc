@@ -21,7 +21,7 @@ bool atag_detect_(cv::Mat& image_gray,
     int& id, double& orientation, double& cx, double& cy);
 void dump_result(cv::Mat& image_gray, AprilTags::TagDetection& detection);
 
-bool DEBUG = true;
+bool DEBUG = false;
 
 // Initialize tag detector
 void atag_init_()
