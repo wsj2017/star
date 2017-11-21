@@ -112,8 +112,6 @@ void TagFamily::decode(TagDetection& det, unsigned long long rCode) const {
       }
     }
   }
-  double dt = (tic_()-t0)*20*1000;
-  std::cout << "Search in code book takes " << dt << " ms." << std::endl;
 
   det.id = bestId;
   det.hammingDistance = bestHamming;
@@ -121,9 +119,6 @@ void TagFamily::decode(TagDetection& det, unsigned long long rCode) const {
   det.good = (det.hammingDistance <= errorRecoveryBits);
   det.obsCode = rCode;
   det.code = bestCode;
-  if (det.good) {
-      std::cout << "GOOD" << std::endl;
-  }
 }
 
 void TagFamily::printHammingDistances() const {
