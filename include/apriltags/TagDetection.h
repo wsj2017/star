@@ -64,6 +64,9 @@ namespace AprilTags {
 		//! Orientation in the xy plane
 		float getXYOrientationD() const;
 
+        // Orientation of left bottom corner to right top corner
+        float getCodeOrientation() const;
+
 		//! The homography is relative to image center, whose coordinates are below.
 		std::pair<float,float> hxy;
 

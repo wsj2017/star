@@ -22,6 +22,7 @@ bool atag_detect_(cv::Mat& image_gray,
 void dump_result(cv::Mat& image_gray, AprilTags::TagDetection& detection);
 
 bool DEBUG = false;
+//bool DEBUG = true;
 
 // Initialize tag detector
 void atag_init_()
@@ -72,7 +73,7 @@ bool atag_detect_(cv::Mat& image_gray, int& id, double& orientation, double& cx,
     id = detection.id;
     cx = detection.cxy.first;
     cy = detection.cxy.second;
-    orientation = detection.getXYOrientationD();
+    orientation = detection.getCodeOrientation();
     if (DEBUG) {
         std::cout << "Best rotation: " << detection.rotation
             << ", hamming dis = " << detection.hammingDistance
@@ -103,10 +104,10 @@ void dump_result(cv::Mat& image_gray, AprilTags::TagDetection& detection)
     cv::circle(cimg, cv::Point2f(p2.first, p2.second), 3, cv::Scalar(0, 255, 0,0), 3);
     cv::circle(cimg, cv::Point2f(p3.first, p3.second), 3, cv::Scalar(0, 255, 0,0), 1);
 
-    float dy = p2.second-p0.second;
+    float dy = -p2.second+p0.second;
     float dx = p2.first-p0.first;
     std::cout << "p0.x = " << p0.first << ", p0.y = " << p0.second << std::endl;
-    std::cout << "p1.x = " << p2.first << ", p1.y = " << p2.second << std::endl;
+    std::cout << "p2.x = " << p2.first << ", p2.y = " << p2.second << std::endl;
     std::cout << "dx = " << dx << ", dy = " << dy << std::endl;
     std::cout << "orientation = " << atan2(dy, dx) << ", degree = " << atan2(dy, dx)*180/3.1415926 << std::endl;
 

@@ -54,6 +54,19 @@ float TagDetection::getXYOrientationD() const {
   return ! std::isnan(float(orient)) ? orient : 0.;
 }
 
+float TagDetection::getCodeOrientation() const {
+  // P0 is the left bottom corner, P1 is the right bottom corner
+  // P2 is the right top corner, P3 is the left top corner
+  std::pair<float,float> p0 = interpolate(-1,-1);   // lower left corner of tag
+  std::pair<float,float> p2 = interpolate(1,1);    // lower right corner of tag
+
+  // We adjust the point coordinates such that the origin is at the left 
+  // bottom corner. (opencv origin is at the left top corner)
+  // We calculate the angle of vector P0P2 (from left bottom to right top)
+  float orient = atan2(p0.second-p2.second, p2.first-p0.first);
+  return ! std::isnan(float(orient)) ? orient : 0.;
+}
+
 std::pair<float,float> TagDetection::interpolate(float x, float y) const {
   float z = homography(2,0)*x + homography(2,1)*y + homography(2,2);
   if ( z == 0 )
