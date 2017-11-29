@@ -17,6 +17,7 @@ EXTERNC void atag_cleanup_();
 EXTERNC int atag_matrix_detect_(int width, int height, 
     unsigned char *data, 
     int* id, double* orientation, double* cx, double* cy);
-
+EXTERNC bool atag_detect_(cv::Mat& image_gray, int& id, double& orientation, 
+            double& cx, double& cy);
 #endif
 
