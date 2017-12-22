@@ -12,6 +12,8 @@
 
 using namespace std;
 
+#define ATAG_DEBUG
+
 namespace AprilTags {
 	
 std::vector<TagDetection> TagDetector::extractTags(const cv::Mat& image) const {
@@ -45,10 +47,40 @@ std::vector<TagDetection> TagDetector::extractTags(const cv::Mat& image) const {
 	// Steps 4-5
 	std::vector<Segment> segments;
 	fit_segments( fimSegCV, fimMagCV, fimThetaCV, uf, segments );
+#ifdef ATAG_DEBUG
+    cout << "Segments size: " << segments.size() << endl;
+    cv::Mat debug_img = image.clone();
+    cv::cvtColor(debug_img, debug_img, cv::COLOR_GRAY2BGR);
+    int idx = 0;
+    for(auto iter = segments.begin(); iter != segments.end(); iter++) {
+        Segment seg =  *iter;
+        cout << "Seg [" << idx++ << "]: P0(" << seg.getX0() << ", "
+            << seg.getY0() << ") P1(" << seg.getX1() << ", "
+            << seg.getY1() << ")" 
+            << " Length = " << seg.getLength() 
+            << " Theta = " << seg.getTheta() << endl;
+
+        if ((seg.getLength() >44) && (seg.getLength()<66)) {
+            cv::line(debug_img, cv::Point(seg.getX0(),  seg.getY0()), 
+                cv::Point(seg.getX1(), seg.getY1()), cv::Scalar(0,0,255));
+        } else {
+            cv::line(debug_img, cv::Point(seg.getX0(),  seg.getY0()), 
+                cv::Point(seg.getX1(), seg.getY1()), cv::Scalar(255,0,0), 3);
+        }
+        //cv::imshow("segment", debug_img);
+        //cv::waitKey(0);
+    }
+    cv::imshow("segment", debug_img);
+    cv::waitKey(0);
+#endif
 
 	// Steps 6-7
 	std::vector<Quad> quads;
 	find_quads( segments, fimOrigCV.size(), opticalCenter, quads );
+
+#ifdef ATAG_DEBUG
+    cout << "Quads detected: " << quads.size() << endl;
+#endif
 
 	//================================================================
 	// Step eight. Decode the quads. For each quad, we first estimate a

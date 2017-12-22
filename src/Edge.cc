@@ -7,7 +7,7 @@ namespace AprilTags {
 float const Edge::minMag = 0.004f;
 float const Edge::maxEdgeCost = 30.f * float(M_PI) / 180.f;
 int const Edge::WEIGHT_SCALE = 100;
-float const Edge::thetaThresh = 100;
+float const Edge::thetaThresh = 125;
 float const Edge::magThresh = 1200;
 
 int Edge::edgeCost(float  theta0, float theta1, float mag1) {
