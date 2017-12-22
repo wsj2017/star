@@ -12,7 +12,7 @@
 
 using namespace std;
 
-#define ATAG_DEBUG
+//#define ATAG_DEBUG
 
 namespace AprilTags {
 	
