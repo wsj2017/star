@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "apriltags/TagDetectionUtils.h"
 
 #include "apriltags/Edge.h"
@@ -13,6 +15,10 @@ double tic() {
   gettimeofday(&t, NULL);
   return ((double)t.tv_sec + ((double)t.tv_usec)/1000000.);
 }
+
+using namespace std;
+
+//#define ATAG_DEBUG
 
 namespace AprilTags
 {
@@ -243,6 +249,9 @@ void find_quads( std::vector<Segment>& segments, const cv::Size imSize,
 
 	// Now, find child segments that begin where each parent segment ends.
 	for (unsigned i = 0; i < segments.size(); i++) {
+#ifdef ATAG_DEBUG
+        cout << "** Segment " << i << endl;
+#endif        
 		Segment& parentseg = segments[i];
 		
 		//compute length of the line segment
@@ -251,33 +260,68 @@ void find_quads( std::vector<Segment>& segments, const cv::Size imSize,
 
 		Gridder<Segment>::iterator iter = gridder.find(parentseg.getX1(), parentseg.getY1(), 0.5f*parentseg.getLength());
 		while(iter.hasNext()) {
-		Segment &child = iter.next();
-		if (MathUtil::mod2pi(child.getTheta() - parentseg.getTheta()) > 0) {
-		continue;
-		}
+		    Segment &child = iter.next();
+#ifdef ATAG_DEBUG
+            cout << "  ** child seg P0(" << child.getX0() << ", " <<child.getY0() << ")"
+                << " P1("  << child.getX1() << ", " <<child.getY1() << ")"
+                << ", theta = " << child.getTheta() << endl;
+            cout << "theta diff = " << MathUtil::mod2pi(child.getTheta() - parentseg.getTheta()) << endl;    
+#endif
+		    if (MathUtil::mod2pi(child.getTheta() - parentseg.getTheta()) > 0) {
+		        continue;
+		    }
 
-		// compute intersection of points
-		GLine2D childLine(std::pair<float,float>(child.getX0(), child.getY0()),
+		    // compute intersection of points
+		    GLine2D childLine(std::pair<float,float>(child.getX0(), child.getY0()),
 				std::pair<float,float>(child.getX1(), child.getY1()));
 
-		std::pair<float,float> p = parentLine.intersectionWith(childLine);
-		if (p.first == -1) {
-		continue;
-		}
+		    std::pair<float,float> p = parentLine.intersectionWith(childLine);
+#ifdef ATAG_DEBUG
+            cout << "Intersection px = " << p.first << ", py = " << p.second << endl;
+#endif
+		    if (p.first == -1) {
+		        continue;
+		    }
 
-		float parentDist = MathUtil::distance2D(p, std::pair<float,float>(parentseg.getX1(),parentseg.getY1()));
-		float childDist = MathUtil::distance2D(p, std::pair<float,float>(child.getX0(),child.getY0()));
+		    float parentDist = MathUtil::distance2D(p, std::pair<float,float>(parentseg.getX1(),parentseg.getY1()));
+		    float childDist = MathUtil::distance2D(p, std::pair<float,float>(child.getX0(),child.getY0()));
 
-		if (max(parentDist,childDist) > parentseg.getLength()) {
-		// cout << "intersection too far" << endl;
-		continue;
-		}
+#ifdef ATAG_DEBUG
+            cout << " parentDist = " << parentDist << ", childDist = " << childDist << endl;
+#endif
+		    if (max(parentDist,childDist) > parentseg.getLength()) {
+		        // cout << "intersection too far" << endl;
+		        continue;
+		    }
 
-		// everything's OK, this child is a reasonable successor.
-		parentseg.children.push_back(&child);
+		    // everything's OK, this child is a reasonable successor.
+		    parentseg.children.push_back(&child);
 		}
 	}
 
+#ifdef ATAG_DEBUG
+    for(unsigned int i = 0; i < segments.size(); i++) {
+        Segment& seg = segments[i];
+        cout << "Segment [" << i << "] " 
+            << "P0 (" << seg.getX0() << ", " << seg.getY0()
+            << ", P1(" << seg.getX1() << ", " << seg.getY1() << ")"
+            << ", Theta = " << seg.getTheta()
+            << ", Length = " << seg.getLength()
+            << ", Children size = " << seg.children.size()
+            << endl;
+        int index = 0;
+        for(auto citer = seg.children.begin(); citer != seg.children.end();
+            citer++) {
+            Segment& cseg = **citer;
+            cout << "    Child Seg [" << index++ << "] "
+                << "P0 (" << cseg.getX0() << ", " << cseg.getY0()
+                << ", P1(" << cseg.getX1() << ", " << cseg.getY1() << ")"
+                << ", Theta = " << cseg.getTheta()
+                << ", Length = " << cseg.getLength()
+                << endl;
+        }
+	}
+#endif
 	//================================================================
 	// Step seven: Search all connected segments to see if any form a loop of length 4.
 	// Add those to the quads list.

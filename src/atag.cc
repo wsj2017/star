@@ -111,6 +111,12 @@ void dump_result(cv::Mat& image_gray, AprilTags::TagDetection& detection)
     std::cout << "dx = " << dx << ", dy = " << dy << std::endl;
     std::cout << "orientation = " << atan2(dy, dx) << ", degree = " << atan2(dy, dx)*180/3.1415926 << std::endl;
 
+    std::cout << "cx = " << detection.cxy.first
+                << ", cy = " << detection.cxy.second
+                << endl;
+
+    cv::circle(cimg, cv::Point2f(detection.cxy.first, detection.cxy.second), 3, cv::Scalar(0,0, 255,0), 3);
+
     cv::imshow("result", cimg);
     cv::waitKey(0);
 }
