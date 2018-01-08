@@ -17,8 +17,6 @@ using namespace std;
 #include <opencv/highgui.h>
 
 AprilTags::TagDetector* ptagDetector = NULL;
-bool atag_detect_(cv::Mat& image_gray, 
-    int& id, double& orientation, double& cx, double& cy);
 void dump_result(cv::Mat& image_gray, AprilTags::TagDetection& detection);
 
 bool DEBUG = false;
@@ -82,6 +80,37 @@ bool atag_detect_(cv::Mat& image_gray, int& id, double& orientation, double& cx,
         dump_result(image_gray, detection);    
     }
     return true;
+}
+
+bool atag_detect(
+    cv::Mat& image_gray,
+    int& id,
+    std::pair<float, float>& p0,
+    std::pair<float, float>& p1,
+    std::pair<float, float>& p2,
+    std::pair<float, float>& p3
+)
+{
+    if (!ptagDetector) {
+        return false;
+    }
+    vector<AprilTags::TagDetection> detections = ptagDetector->extractTags(image_gray);
+    if (detections.size() != 1) {
+        return false;
+    }
+
+    AprilTags::TagDetection& detection = detections[0];
+    if (!detection.good) {
+        // This is just a sanity check. All detection is the vector detections
+        // should be good. Something is wrong if code reaches here.
+        return false;
+    }
+    id = detection.id;
+    p0 = detection.interpolate(-1,-1);
+    p1 = detection.interpolate(1,-1);
+    p2 = detection.interpolate(1,1);
+    p3 = detection.interpolate(-1,1);
+    return true; 
 }
 
 void dump_result(cv::Mat& image_gray, AprilTags::TagDetection& detection)

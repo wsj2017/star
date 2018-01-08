@@ -19,5 +19,13 @@ EXTERNC int atag_matrix_detect_(int width, int height,
     int* id, double* orientation, double* cx, double* cy);
 EXTERNC bool atag_detect_(cv::Mat& image_gray, int& id, double& orientation, 
             double& cx, double& cy);
+EXTERNC bool atag_detect(
+    cv::Mat& image_gray,
+    int& id,
+    std::pair<float, float>& p0,
+    std::pair<float, float>& p1,
+    std::pair<float, float>& p2,
+    std::pair<float, float>& p3
+);
 #endif
 
